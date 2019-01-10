@@ -6,6 +6,8 @@
  *
  * MIT (c) Adnan Ahmed <mahradnan@hotmail.com>
  */
+
+
 (function () {
 
     var Helper = {
@@ -26,6 +28,7 @@
             $(Config.EX_COTAINER).hide();
             $(Config.EX_INPUT_TITLE).val('');
             $(Config.EX_INPUT_URL).val('');
+            $(Config.EX_INPUT_NOTES).val('');
             $(Config.EX_INPUT_COMMENT).val('');
 
             return true;
@@ -109,6 +112,10 @@
         '<input type="hidden" name="url">' +
         '</div>' +
         '<div class="clogl">' +
+        '<div class="lbllogh">Notes</div>' +
+        '<textarea name="notes"></textarea>' +
+        '</div>' +
+        '<div class="clogl">' +
         '<div class="lbllogh"><span class="reqlogh">*</span>Comment (commit message)</div>' +
         '<textarea name="comment"></textarea>' +
         '</div>' +
@@ -125,6 +132,7 @@
         EX_COTAINER: '.logh',
         EX_INPUT_TITLE: '.logh input[name="title"]',
         EX_INPUT_URL: '.logh input[name="url"]',
+        EX_INPUT_NOTES: '.logh textarea[name="notes"]',
         EX_INPUT_COMMENT: '.logh textarea[name="comment"]',
         EX_CONTAINER_BODY: 'body',
         EX_BTN_SAVE: '.logh #logh_btn_save',
@@ -189,6 +197,7 @@
 
             let activeTabTitle = $(Config.EX_INPUT_TITLE).val(),
                 activeTabUrl = $(Config.EX_INPUT_URL).val(),
+                userNotes = $(Config.EX_INPUT_NOTES).val(),
                 commitMessage = $(Config.EX_INPUT_COMMENT).val();
 
             fetch(repoUrl)
@@ -199,7 +208,7 @@
                         encodedContent = response.content,
                         decodedContent = decodeURIComponent(escape(window.atob(encodedContent)));
 
-                    const dataToAppend = `- [${activeTabTitle}](${activeTabUrl}) \n`;
+                    const dataToAppend = `### [${activeTabTitle}](${activeTabUrl}) \n${userNotes}\n`;
 
                     // append data in the front
                     decodedContent = Repo.appendDataBefore(dataToAppend, decodedContent);
@@ -263,9 +272,9 @@
         appendDataBefore: function (dataToAppend, content) {
             // If the file is empty
             if (content.trim().length === 0) {
-                content += '# today-i-liked \nContent that I liked. Saved using https://goo.gl/Wj595G \n';
+                content += 'Saved using https://goo.gl/Wj595G \n';
             }
-            const arr = content.split('###');
+            const arr = content.split('##');
             // if the length of arr is 1, then it is the first time to append data
             if (arr.length === 1) {
                 arr[0] += Repo.getDateHeader();
@@ -279,7 +288,7 @@
                 } else {    // if already have date then append to that
                     arr[1] += dataToAppend;
                 }
-                content = arr.join('###');
+                content = arr.join('##');
             }
             return content;
         },
@@ -425,6 +434,7 @@
                         $(Config.EX_INPUT_TITLE).val(activeTab.title);
                         $(Config.EX_INPUT_URL).val(activeTab.url);
                         $(Config.EX_INPUT_COMMENT).val('New Link: ' + activeTab.title);
+                        $(Config.EX_INPUT_NOTES).val(activeTab.title +'::\n' +activeTab.url);
                     });
                 });
             }
